@@ -5,22 +5,47 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 import logging
-from dotenv import load_dotenv
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
-
+from dotenv import load_dotenv
 
 import database
 
+
 # INIT
 reminder_weeks_tuple = (28, 30, 34)  # weeks when to be notified
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    filename='data.log',
-    encoding='utf-8',
-    level=logging.DEBUG,
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S %Z'
+
+# --- Setup log folder ---
+log_dir = Path(__file__).parent / "logs"
+log_dir.mkdir(exist_ok=True)  # create folder if it doesn't exist
+log_file = log_dir / "data.log"
+
+# --- Configure logging ---
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+# Rotating file handler: max 5 MB per file, keep 3 backups
+file_handler = RotatingFileHandler(
+    log_file,
+    maxBytes=5_000_000,
+    backupCount=3,
+    encoding='utf-8'
 )
+
+formatter = logging.Formatter(
+    '%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S %Z')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+# logger = logging.getLogger(__name__)
+# logging.basicConfig(
+#     filename='data.log',
+#     encoding='utf-8',
+#     level=logging.DEBUG,
+#     format='%(asctime)s %(levelname)-8s %(message)s',
+#     datefmt='%Y-%m-%d %H:%M:%S %Z'
+# )
 
 env_path = Path(__file__).resolve().parent.parent / "stack.env"
 load_dotenv(dotenv_path=env_path)
@@ -135,8 +160,8 @@ def run_bot():
         else:
             guild_id = interaction.guild.id
             channel_id = channel.id
+            logger.info(f"guild_id {guild_id}, channel_id, {channel_id}")
             database.set_target_channel(guild_id, channel_id)
-            print("guild_id:", guild_id, "channel_id", channel_id)
             await interaction.response.send_message(f"Påminnelser kommer nu att skickas till kanal <#{channel_id}>")
 
     client.run(TOKEN)

@@ -1,12 +1,18 @@
 import os
 from pymongo import MongoClient
 import logging
+
 logging.getLogger('pymongo').setLevel(logging.WARNING)
 
-mongo_uri = os.getenv("MONGO_URI", "mongodb://mongo:27017/courseReminderBotDB")
+mongo_uri = os.getenv("MONGO_URI")
+
+if not mongo_uri:
+    # Try localhost first (works without Docker)
+    mongo_uri = "mongodb://localhost:27017/courseReminderBotDB"
+
 client = MongoClient(mongo_uri)
 
-db = client.courseReminderBotDB
+db = client.get_database()
 guilds = db.guilds
 guilds_coll = db["guilds"]
 
