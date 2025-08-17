@@ -1,0 +1,15 @@
+# Ignore Python venvs
+**/.venv
+**/venv
+**/__pycache__
+
+# Ignore pyc files
+*.pyc
+*.pyo
+
+# Ignore git stuff
+.git
+.gitignore
+
+# Ignore logs
+*.log
