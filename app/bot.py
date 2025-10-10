@@ -13,7 +13,7 @@ import database
 
 
 # INIT
-reminder_weeks_tuple = (28, 30, 34, 35, 44)  # weeks when to be notified
+reminder_weeks_tuple = (28, 30, 34, 35, 41, 44)  # weeks when to be notified
 
 # --- Setup log folder ---
 log_dir = Path(__file__).parent / "logs"
